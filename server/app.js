@@ -21,6 +21,16 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     console.log('user disconnected');
   });
+
+  socket.on('sender-join', (data) => {
+    socket.join(data.roomId) 
+  })
+
+  socket.on('receiver-join', (data) => {
+    socket.join(data.roomId) 
+    socket.in(data.roomId).emit('init', data.roomId)
+  })
+  //use multer in /
 });
 
 server.listen(3000, () => {
