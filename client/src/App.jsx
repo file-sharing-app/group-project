@@ -13,7 +13,7 @@ const router = createBrowserRouter([
     path: "/login",
   },
   {
-    loader: ()=> !localStorage.getItem("access_token") && redirect("/login"),
+    // loader: ()=> !localStorage.getItem("access_token") && redirect("/login"),
     children: [
       {
         path: "/",
