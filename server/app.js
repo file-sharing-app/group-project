@@ -1,4 +1,5 @@
-const express = require('express')
+const express = require('express');
+const Controller = require('./controllers/controller');
 const { createServer } = require('node:http')
 const { Server } = require('socket.io')
 
@@ -10,9 +11,10 @@ const io = new Server(server, {
   }
 })
 
-app.get('/', (req, res) => {
-  res.send('Hello World!')
-})
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+app.post("/register", Controller.register)
 
 io.on('connection', (socket) => {
   console.log('a user connected');
