@@ -1,8 +1,42 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { SocketContext } from "../App";
 
 function Sender() {
   const navigate = useNavigate();
+  const [roomId, setRoomId] = useState('')
+  const {socket} = useContext(SocketContext)
+
+  function generateRoomId() {
+    return `${Math.trunc(Math.random()*999)}-${Math.trunc(Math.random()*999)}-${Math.trunc(Math.random()*999)}`
+  }
+
+  function handleSubmit(event) {
+    event.preventDefault()
+    socket.on('init', () => {
+      document.querySelector('#file-upload').addEventListener('change', (e) => {
+        let file = e.target.files[0]
+        let reader = new FileReader()
+        reader.onload = () => {
+          let buffer = new Uint8Array(reader.result)
+
+        }
+        reader.readAsArrayBuffer(file)
+      })
+    })
+  }
+
+  function shareFile(metadata, buffer, progress_el) {
+    
+  }
+
+  useEffect(() => {
+    setRoomId(generateRoomId())
+  }, [])
+
+  useEffect(() => {
+    if (roomId) socket.emit('sender-join', {roomId})
+  }, [roomId])
 
   return (
     <>
@@ -19,11 +53,11 @@ function Sender() {
                 Ac euismod vel sit maecenas id pellentesque eu sed consectetur.
                 Malesuada adipiscing sagittis vel nulla.
               </p>
-              <form className="w-full max-w-md lg:col-span-5 lg:pt-2">
+              <form onSubmit={handleSubmit} className="w-full max-w-md lg:col-span-5 lg:pt-2">
                 <div className="flex gap-x-4">
                   <div className="col-span-full">
                   <h3>Your Code is Here:</h3>
-                    <h4 className="text-white-800">000-000-000</h4>
+                    <h4 className="text-white-800">{roomId}</h4>
                     <div className="mt-2 flex justify-center rounded-lg border border-dashed border-white-900/25 px-6 py-10">
                       <div className="text-center">
                         <div className="mt-4 flex text-sm leading-6 text-white-800">

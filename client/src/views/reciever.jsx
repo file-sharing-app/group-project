@@ -1,8 +1,15 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { SocketContext } from "../App";
 
 function Sender() {
   const navigate = useNavigate();
+  const [roomId, setRoomId] = useState('') //TODO: masukin room id dari input
+  const {socket} = useContext(SocketContext)
+
+  useEffect(() => {
+    if (roomId) socket.emit('receiver-join', {roomId})
+  }, [roomId])
 
   return (
     <>

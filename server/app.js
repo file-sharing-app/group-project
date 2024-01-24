@@ -1,7 +1,6 @@
 if (process.env.NODE_ENV !== "production") {
   require("dotenv").config();
 }
-
 const express = require('express');
 const Controller = require('./controllers/controller');
 const { createServer } = require('node:http')
@@ -29,13 +28,15 @@ io.on('connection', (socket) => {
 
   socket.on('sender-join', (data) => {
     socket.join(data.roomId) 
+    console.log('sender-join', data.roomId)
   })
 
   socket.on('receiver-join', (data) => {
     socket.join(data.roomId) 
     socket.in(data.roomId).emit('init', data.roomId)
+    console.log('receiver-join')
   })
-  //use multer in /
+  
 });
 
 server.listen(3000, () => {
