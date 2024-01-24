@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -13,20 +14,22 @@ export default function Login() {
   const handleOnSubmit = async (e) => {
     e.preventDefault();
     try {
-      console.log("login jsx", formLogin);
-
       const { data } = await axios.post(
         "http://localhost:3000/login",
         formLogin
       );
+      
       console.log(data.access_token, "login page on submit");
       localStorage.setItem("access_token", data.access_token);
-
       navigate("/");
       console.log("setelah login");
     } catch (error) {
-      console.log(error, "login jsx");
-      throw error;
+      console.log(error);
+      Swal.fire({
+        icon: "error",
+        title: "OOPS!!!",
+        text: error.response.data.message,
+      });
     }
   };
 
@@ -63,8 +66,7 @@ export default function Login() {
           rounded-3xl
           w-50
           max-w-md
-        "
-        >
+        ">
           <div className="font-medium self-center text-xl sm:text-3xl text-gray-800">
             Login
           </div>
@@ -76,8 +78,7 @@ export default function Login() {
               <div className="flex flex-col mb-5">
                 <label
                   htmlFor="email"
-                  className="mb-1 text-xs tracking-wide text-gray-600"
-                >
+                  className="mb-1 text-xs tracking-wide text-gray-600">
                   E-Mail Address:
                 </label>
                 <div className="relative">
@@ -92,8 +93,7 @@ export default function Login() {
                   h-full
                   w-10
                   text-gray-400
-                "
-                  >
+                ">
                     <i className="fas fa-at text-teal-500" />
                   </div>
                   <input
@@ -120,8 +120,7 @@ export default function Login() {
               <div className="flex flex-col mb-6">
                 <label
                   htmlFor="password"
-                  className="mb-1 text-xs sm:text-sm tracking-wide text-gray-600"
-                >
+                  className="mb-1 text-xs sm:text-sm tracking-wide text-gray-600">
                   Password:
                 </label>
                 <div className="relative">
@@ -136,8 +135,7 @@ export default function Login() {
                       h-full
                       w-10
                       text-gray-400
-                    "
-                  >
+                    ">
                     <span>
                       <i className="fas fa-lock text-teal-500" />
                     </span>
@@ -182,8 +180,7 @@ export default function Login() {
                     transition
                     duration-150
                     ease-in
-                  "
-                >
+                  ">
                   <span className="mr-2 uppercase">Submit</span>
                   <span>
                     <svg
@@ -193,14 +190,31 @@ export default function Login() {
                       strokeLinejoin="round"
                       strokeWidth={2}
                       viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
+                      stroke="currentColor">
                       <path d="M13 9l3 3m0 0l-3 3m3-3H8m13 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </span>
                 </button>
               </div>
             </form>
+          </div>
+          <div className="flex justify-center items-center mt-6">
+            <a
+              target="_blank"
+              className="
+            inline-flex
+            items-center
+            text-gray-700
+            font-medium
+            text-xs text-center
+          ">
+              <span className="ml-2">You don't have an account?</span>
+            </a>
+            <Link
+              to="/register"
+              className="text-xs ml-2 text-teal-500 font-semibold">
+              Register here
+            </Link>
           </div>
         </div>
       </div>

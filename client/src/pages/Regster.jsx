@@ -42,13 +42,15 @@ export default function Register() {
           });
           navigate("/login");
         }
-
         console.log("setelah register");
       }
     } catch (error) {
       console.log(error, "registerpage jsx");
-      throw error;
-    }
+      Swal.fire({
+        icon: "error",
+        title: "OOPS!!!",
+        text: error.response.data.message,
+      });    }
   };
 
   const handleChangeRegister = (e) => {
@@ -274,7 +276,6 @@ export default function Register() {
         </div>
         <div className="flex justify-center items-center mt-6">
           <a
-            href="#"
             target="_blank"
             className="
             inline-flex
