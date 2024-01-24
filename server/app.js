@@ -1,3 +1,7 @@
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config();
+}
+
 const express = require('express');
 const Controller = require('./controllers/controller');
 const { createServer } = require('node:http')
@@ -15,6 +19,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.post("/register", Controller.register)
+app.post("/login", Controller.login)
 
 io.on('connection', (socket) => {
   console.log('a user connected');
