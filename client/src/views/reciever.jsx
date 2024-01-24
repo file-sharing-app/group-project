@@ -23,13 +23,19 @@ function Sender() {
     socket.on("server-share", (buffer) => {
       pushBuffer(buffer);
       sumTransmitted(buffer);
-      console.log(file, "<<< file");
+      console.log("file.transmitted:", file.transmitted);
+      console.log(
+        "file.metadata.total_buffer_size:",
+        file?.metadata?.total_buffer_size
+      );
       if (file.transmitted) {
-        if (file.transmitted === file.metadata.total_buffer_size) {
+        if (file.transmitted >= file?.metadata?.total_buffer_size) {
+          console.log("File fully transmitted. Initiating download...");
           download(new Blob(file.buffer), file.metadata.filename);
           setFile({});
         }
       } else {
+        console.log("Continue the transmission process...");
         socket.emit("receiver-start", { roomId });
       }
     });
@@ -39,10 +45,16 @@ function Sender() {
     console.log(roomId, "<- roomId");
   }, [roomId]);
 
+  // function pushBuffer(buffer) {
+  //   setFile((prevFile) => ({
+  //     ...prevFile,
+  //     buffer: [...prevFile.buffer, buffer],
+  //   }));
+  // }
   function pushBuffer(buffer) {
     setFile((prevFile) => ({
       ...prevFile,
-      buffer: [...prevFile.buffer, buffer],
+      buffer: prevFile.buffer ? [...prevFile.buffer, buffer] : [buffer],
     }));
   }
 
