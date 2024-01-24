@@ -5,6 +5,7 @@ const express = require('express');
 const Controller = require('./controllers/controller');
 const { createServer } = require('node:http')
 const { Server } = require('socket.io')
+const cors = require("cors")
 
 const app = express()
 const server = createServer(app)
@@ -13,6 +14,8 @@ const io = new Server(server, {
     origin: "http://localhost:5173"
   }
 })
+app.use(cors())
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
