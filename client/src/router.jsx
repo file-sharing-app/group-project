@@ -7,6 +7,14 @@ import Sender from './views/sender'
 import Reciever from './views/reciever'
 
 
+const auth = () => {
+    if (!localStorage.access_token) {
+      return redirect("/login");
+    }
+    return null;
+  };
+
+
 export const router = createBrowserRouter([
   {
     path: "/register",
@@ -17,7 +25,7 @@ export const router = createBrowserRouter([
     element: <Login />,
   },
   {
-    loader: ()=> !localStorage.getItem("access_token") && redirect("/login"),
+    // loader: auth,
     children: [
       {
         path: "/",
