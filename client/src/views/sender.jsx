@@ -11,7 +11,7 @@ function Sender() {
           <div className="relative isolate overflow-hidden bg-sky-900 px-6 pt-16 shadow-2xl sm:rounded-3xl sm:px-16 md:pt-24 lg:flex lg:gap-x-20 lg:px-24 lg:pt-0">
             <div className="mx-auto max-w-md text-center lg:mx-0 lg:flex-auto lg:py-32 lg:text-left">
               <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-                Boost your productivity.
+                Upload Your Data
                 <br />
                 Start using our app today.
               </h2>
@@ -50,8 +50,8 @@ function Sender() {
                   </div>
                   <button
                     type="submit"
-                    className="flex-none rounded-md bg-white px-3.5 py-2.5 text-sm font-semibold text-indigo-600 shadow-sm hover:bg-indigo-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
-                    Submit
+                    className="flex-none rounded-md bg-white px-3.5 py-2.5 text-sm font-semibold text-white-800 shadow-sm hover:bg-sky-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white h-fit self-end">
+                    Send File
                   </button>
                 </div>
               </form>
