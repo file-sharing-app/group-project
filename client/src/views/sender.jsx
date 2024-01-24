@@ -5,6 +5,8 @@ import { SocketContext } from "../App";
 function Sender() {
   const navigate = useNavigate();
   const [roomId, setRoomId] = useState("");
+  const [buffer, setBuffer] = useState([]);
+  const [metadata, setMetadata] = useState({});
   const { socket } = useContext(SocketContext);
 
   function generateRoomId() {
@@ -15,29 +17,29 @@ function Sender() {
 
   function handleSubmit(event) {
     event.preventDefault();
-    socket.on("init", () => {
-      const file = event.target.querySelector('input[type="file"]').files;
-      const reader = new FileReader();
-      reader.onload = () => {
-        let buffer = new Uint8Array(reader.result);
-        shareFile(
-          {
-            filename: file.name,
-            total_buffer_size: buffer.length,
-            buffer_size: 1024,
-          },
-          buffer
-        );
-      };
-      reader.readAsArrayBuffer(file);
-    });
+    const file = event.target.querySelector('input[type="file"]').files[0];
+    console.log(file);
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setBuffer(new Uint8Array(reader.result));
+      console.log(buffer, "test");
+      shareFile(
+        {
+          filename: file.name,
+          total_buffer_size: new Uint8Array(reader.result).byteLength,
+          buffer_size: 1024,
+        }
+      );
+    };
+    reader.readAsArrayBuffer(file);
   }
 
-  function shareFile(metadata, buffer) {
-    socket.emit('sender-file-meta', {
+  function shareFile(metadata) {
+    socket.emit("sender-file-meta", {
       roomId,
-      metadata
-    })
+      metadata,
+    });
+    setMetadata(metadata);
   }
 
   useEffect(() => {
@@ -47,6 +49,28 @@ function Sender() {
   useEffect(() => {
     if (roomId) socket.emit("sender-join", { roomId });
   }, [roomId]);
+
+  console.log(socket);
+  useEffect(() => {
+    socket.on("init", (data) => {});
+    console.log(buffer, "<<< buffer");
+
+    if (buffer.length != 0) {
+      socket.on("server-start", () => {
+        console.log("server-start");
+        console.log(buffer, "<<< buffer");
+        let chunk = buffer.slice(0, metadata.buffer_size);
+        setBuffer(buffer.slice(metadata.buffer_size, buffer.length));
+        console.log(chunk, "<<<< chunk");
+        if (chunk.length != 0) {
+          socket.emit("sender-file-raw", {
+            roomId,
+            buffer: chunk,
+          });
+        }
+      });
+    }
+  }, [socket, buffer, metadata]);
 
   return (
     <>

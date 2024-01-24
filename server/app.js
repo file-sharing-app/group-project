@@ -24,7 +24,6 @@ app.post("/register", Controller.register)
 app.post("/login", Controller.login)
 
 io.on('connection', (socket) => {
-  console.log('a user connected');
   socket.on('disconnect', () => {
     console.log('user disconnected');
   });
@@ -36,12 +35,22 @@ io.on('connection', (socket) => {
 
   socket.on('receiver-join', (data) => {
     socket.join(data.roomId) 
+    console.log('receiver-join', data.roomId)
     socket.in(data.roomId).emit('init', data.roomId)
-    console.log('receiver-join')
   })
 
   socket.on('sender-file-meta', (data) => {
     socket.in(data.roomId).emit('server-meta', data.metadata)
+  })
+
+  socket.on('receiver-start', (data) => {
+    console.log('server-start emitted', data.roomId);
+    socket.in(data.roomId).emit('server-start', {})
+  })
+
+  socket.on('sender-file-raw', (data) => {
+    socket.in(data.roomId).emit('server-share', data.buffer)
+    console.log('server-share emitted', data.roomId);
   })
   
 });

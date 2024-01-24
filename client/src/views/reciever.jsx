@@ -1,15 +1,64 @@
 import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { SocketContext } from "../App";
+import download from "downloadjs";
 
 function Sender() {
   const navigate = useNavigate();
-  const [roomId, setRoomId] = useState('') //TODO: masukin room id dari input
-  const {socket} = useContext(SocketContext)
+  const [file, setFile] = useState({});
+  const [roomId, setRoomId] = useState("");
+  const { socket } = useContext(SocketContext);
 
   useEffect(() => {
-    if (roomId) socket.emit('receiver-join', {roomId})
-  }, [roomId])
+    if (roomId) {
+      socket.on("server-meta", (metadata) => {
+        console.log("server-meta", metadata);
+        setFile({ metadata, transmitted: 0, buffer: [] });
+        socket.emit("receiver-start", { roomId });
+      });
+    }
+  }, [socket, roomId]);
+
+  useEffect(() => {
+    socket.on("server-share", (buffer) => {
+      pushBuffer(buffer);
+      sumTransmitted(buffer);
+      console.log(file, "<<< file");
+      if (file.transmitted) {
+        if (file.transmitted === file.metadata.total_buffer_size) {
+          download(new Blob(file.buffer), file.metadata.filename);
+          setFile({});
+        }
+      } else {
+        socket.emit("receiver-start", { roomId });
+      }
+    });
+  }, [socket, file]);
+
+  useEffect(() => {
+    console.log(roomId, "<- roomId");
+  }, [roomId]);
+
+  function pushBuffer(buffer) {
+    setFile((prevFile) => ({
+      ...prevFile,
+      buffer: [...prevFile.buffer, buffer],
+    }));
+  }
+
+  function sumTransmitted(buffer) {
+    setFile((prevFile) => ({
+      ...prevFile,
+      transmitted: prevFile.transmitted + buffer.byteLength,
+    }));
+  }
+
+  function handleSubmit(event) {
+    event.preventDefault();
+    const code = event.target[0].value;
+    setRoomId(code);
+    socket.emit("receiver-join", { roomId: event.target[0].value });
+  }
 
   return (
     <>
@@ -27,16 +76,19 @@ function Sender() {
                 Malesuada adipiscing sagittis vel nulla.
               </p>
 
-              <form>
+              <form onSubmit={handleSubmit}>
                 <input
                   className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500"
+                  name="code"
                   placeholder="Input Your Code Here..."
                 />
-                <button className="flex-none rounded-md bg-white px-3.5 py-2.5 text-sm font-semibold text-white-800 shadow-sm hover:bg-sky-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white h-fit self-end mt-5">
+                <button
+                  type="submit"
+                  className="flex-none rounded-md bg-white px-3.5 py-2.5 text-sm font-semibold text-white-800 shadow-sm hover:bg-sky-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white h-fit self-end mt-5"
+                >
                   Submit
                 </button>
               </form>
-              
             </div>
             <div>
               <form className="w-full max-w-md lg:col-span-5 lg:pt-2 mt-32 justify-center">
