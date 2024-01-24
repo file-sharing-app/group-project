@@ -50,7 +50,8 @@ export default function Register() {
         icon: "error",
         title: "OOPS!!!",
         text: error.response.data.message,
-      });    }
+      });    
+    }
   };
 
   const handleChangeRegister = (e) => {
