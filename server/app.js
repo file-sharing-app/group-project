@@ -6,7 +6,8 @@ const express = require('express');
 const Controller = require('./controllers/controller');
 const app = express()
 const port = 3000
-const cors = require("cors")
+const cors = require("cors");
+const errHandle = require("./middlewares/errorHandlers");
 app.use(cors())
 
 
@@ -16,5 +17,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.post("/register", Controller.register)
 app.post("/login", Controller.login)
+
+app.use(errHandle)
 
 module.exports = app

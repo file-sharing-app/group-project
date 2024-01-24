@@ -26,23 +26,20 @@ module.exports = class Controller {
   static async login(req, res, next) {
     try {
       const { email, password } = req.body;
-      console.log(req.body, "<<<<<<");
       if (!email) {
-        throw { name: "EmailNull" };
+        throw { name: "EmailEmpty" };
       }
       if (!password) {
-        throw { name: "PasswordNull" };
+        throw { name: "PasswordEmpty" };
       }
 
       const user = await User.findOne({ where: { email } });
-      console.log(user, "<<user>>");
 
       if (!user) {
         throw { name: "InvalidLogin" };
       }
 
       const isPasswordValid = comparePassword(password, user.password);
-      console.log(isPasswordValid, "<<<<<<");
 
       if (!isPasswordValid) {
         throw { name: "InvalidLogin" };

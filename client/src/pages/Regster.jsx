@@ -30,7 +30,7 @@ export default function Register() {
           "http://localhost:3000/register",
           formRegister
         );
-        console.log(data, ">>res");
+        // console.log(data, ">>res");
 
         if (status === 201) {
           await Swal.fire({
