@@ -39,6 +39,10 @@ io.on('connection', (socket) => {
     socket.in(data.roomId).emit('init', data.roomId)
     console.log('receiver-join')
   })
+
+  socket.on('sender-file-meta', (data) => {
+    socket.in(data.roomId).emit('server-meta', data.metadata)
+  })
   
 });
 
