@@ -87,9 +87,6 @@ function Sender() {
                 Ac euismod vel sit maecenas id pellentesque eu sed consectetur.
                 Malesuada adipiscing sagittis vel nulla.
               </p>
-
-              <h3 className="text-white">Your Code is Here:</h3>
-              <h4 className="text-white">000-000-000</h4>
             </div>
 
             <form
@@ -97,9 +94,9 @@ function Sender() {
               className="w-full max-w-md lg:col-span-5 lg:pt-2 mt-32"
             >
               <div className="flex gap-x-4">
-                <div className="col-span-full">
+                <div className="col-span-full text-white font-bold">
                   <h3>Your Code is Here:</h3>
-                  <h4 className="text-white-800">{roomId}</h4>
+                  <h4 className="text-white">{roomId}</h4>
                   <div className="mt-2 flex justify-center rounded-lg border border-dashed border-white-900/25 px-6 py-10">
                     <div className="text-center">
                       <div className="mt-4 flex text-sm leading-6 text-white-800">

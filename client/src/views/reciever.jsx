@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { SocketContext } from "../App";
 import download from "downloadjs";
+import Swal from "sweetalert2";
 
 function Sender() {
   const navigate = useNavigate();
@@ -67,9 +68,26 @@ function Sender() {
 
   function handleSubmit(event) {
     event.preventDefault();
+    try {
     const code = event.target[0].value;
     setRoomId(code);
-    socket.emit("receiver-join", { roomId: event.target[0].value });
+    const result = socket.emit("receiver-join", { roomId: event.target[0].value });
+      if (result) {
+          Swal.fire({
+          icon: "success",
+          title: `Download Proceesing...`,
+        });
+      }
+    return null
+    } catch (error) {
+      console.log(error);
+      Swal.fire({
+        icon: "error",
+        title: "OOPS!!!",
+        text: error.response.data.message,
+      });
+    }
+    
   }
 
   return (
@@ -103,21 +121,6 @@ function Sender() {
               </form>
             </div>
             <div>
-              <form className="w-full max-w-md lg:col-span-5 lg:pt-2 mt-32 justify-center">
-                <div className="flex gap-x-4">
-                  <div className="col-span-full">
-                    <div className="mt-2 flex justify-center rounded-lg border border-dashed border-white-900/25 px-6 py-10">
-                      <div className="text-center">
-                        <div className="mt-4 flex text-sm leading-6 text-white-800">
-                          <h3 variant="h6" color="blue-gray" className="-mb-3">
-                            Loading...
-                          </h3>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </form>
             </div>
           </div>
         </div>
