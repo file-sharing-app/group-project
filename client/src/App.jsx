@@ -1,13 +1,22 @@
-import { RouterProvider } from 'react-router-dom'
+import { io } from "socket.io-client";
+import {
+  RouterProvider,
+  createBrowserRouter,
+  redirect,
+} from "react-router-dom";
 import router from './router'
+import { createContext } from "react";
+
+const socket = io("http://localhost:3000");
+export const SocketContext = createContext(null);
 
 function App() {
 
   return (
-    <>
-    <RouterProvider router={router}/>
-    </>
-  )
+    <SocketContext.Provider value={{socket}}>
+      <RouterProvider router={router} />
+    </SocketContext.Provider>
+  );
 }
 
-export default App
+export default App;

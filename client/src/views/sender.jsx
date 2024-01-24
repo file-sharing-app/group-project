@@ -1,8 +1,76 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { SocketContext } from "../App";
 
 function Sender() {
   const navigate = useNavigate();
+  const [roomId, setRoomId] = useState("");
+  const [buffer, setBuffer] = useState([]);
+  const [metadata, setMetadata] = useState({});
+  const { socket } = useContext(SocketContext);
+
+  function generateRoomId() {
+    return `${Math.trunc(Math.random() * 999)}-${Math.trunc(
+      Math.random() * 999
+    )}-${Math.trunc(Math.random() * 999)}`;
+  }
+
+  function handleSubmit(event) {
+    event.preventDefault();
+    const file = event.target.querySelector('input[type="file"]').files[0];
+    console.log(file);
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setBuffer(new Uint8Array(reader.result));
+      console.log(buffer, "test");
+      shareFile(
+        {
+          filename: file.name,
+          total_buffer_size: new Uint8Array(reader.result).byteLength,
+          buffer_size: 1024,
+        }
+      );
+    };
+    reader.readAsArrayBuffer(file);
+  }
+
+  function shareFile(metadata) {
+    socket.emit("sender-file-meta", {
+      roomId,
+      metadata,
+    });
+    setMetadata(metadata);
+  }
+
+  useEffect(() => {
+    setRoomId(generateRoomId());
+  }, []);
+
+  useEffect(() => {
+    if (roomId) socket.emit("sender-join", { roomId });
+  }, [roomId]);
+
+  console.log(socket);
+  useEffect(() => {
+    socket.on("init", (data) => {});
+    console.log(buffer, "<<< buffer");
+
+    if (buffer.length != 0) {
+      socket.on("server-start", () => {
+        console.log("server-start");
+        console.log(buffer, "<<< buffer");
+        let chunk = buffer.slice(0, metadata.buffer_size);
+        setBuffer(buffer.slice(metadata.buffer_size, buffer.length));
+        console.log(chunk, "<<<< chunk");
+        if (chunk.length != 0) {
+          socket.emit("sender-file-raw", {
+            roomId,
+            buffer: chunk,
+          });
+        }
+      });
+    }
+  }, [socket, buffer, metadata]);
 
   return (
     <>
@@ -23,42 +91,48 @@ function Sender() {
               <h3 className="text-white">Your Code is Here:</h3>
               <h4 className="text-white">000-000-000</h4>
             </div>
-            
-            <form className="w-full max-w-md lg:col-span-5 lg:pt-2 mt-32">
-                <div className="flex gap-x-4">
-                  <div className="col-span-full">
-                    <div className="mt-2 flex justify-center rounded-lg border border-dashed border-white-900/25 px-6 py-10">
-                      <div className="text-center">
-                        <div className="mt-4 flex text-sm leading-6 text-white-800">
-                          <label
-                            htmlFor="file-upload"
-                            className="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500">
-                            <span>Upload a file</span>
-                            <input
-                              id="file-upload"
-                              name="file-upload"
-                              type="file"
-                              className="sr-only"
-                            />
-                          </label>
-                          <p className="text-xs leading-5 text-white-800">
-                            or drag and drop
-                          </p>
-                        </div>
+
+            <form
+              onSubmit={handleSubmit}
+              className="w-full max-w-md lg:col-span-5 lg:pt-2 mt-32"
+            >
+              <div className="flex gap-x-4">
+                <div className="col-span-full">
+                  <h3>Your Code is Here:</h3>
+                  <h4 className="text-white-800">{roomId}</h4>
+                  <div className="mt-2 flex justify-center rounded-lg border border-dashed border-white-900/25 px-6 py-10">
+                    <div className="text-center">
+                      <div className="mt-4 flex text-sm leading-6 text-white-800">
+                        <label
+                          htmlFor="file-upload"
+                          className="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500"
+                        >
+                          <span>Upload a file</span>
+                          <input
+                            id="file-upload"
+                            name="file-upload"
+                            type="file"
+                            className="sr-only"
+                          />
+                        </label>
                         <p className="text-xs leading-5 text-white-800">
-                          PNG, JPG, GIF up to 10MB
+                          or drag and drop
                         </p>
                       </div>
+                      <p className="text-xs leading-5 text-white-800">
+                        PNG, JPG, GIF up to 10MB
+                      </p>
                     </div>
                   </div>
-                  <button
-                    type="submit"
-                    className="flex-none rounded-md bg-white px-3.5 py-2.5 text-sm font-semibold text-white-800 shadow-sm hover:bg-sky-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white h-fit self-end">
-                    Send File
-                  </button>
                 </div>
-              </form>
-
+                <button
+                  type="submit"
+                  className="flex-none rounded-md bg-white px-3.5 py-2.5 text-sm font-semibold text-white-800 shadow-sm hover:bg-sky-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white h-fit self-end"
+                >
+                  Send File
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       </div>
