@@ -23,13 +23,11 @@ function Sender() {
     reader.onload = (event) => {
       setBuffer(new Uint8Array(reader.result));
       console.log(buffer, "test");
-      shareFile(
-        {
-          filename: file.name,
-          total_buffer_size: new Uint8Array(reader.result).byteLength,
-          buffer_size: 1024,
-        }
-      );
+      shareFile({
+        filename: file.name,
+        total_buffer_size: new Uint8Array(reader.result).byteLength,
+        buffer_size: 1024,
+      });
     };
     reader.readAsArrayBuffer(file);
   }
@@ -91,44 +89,23 @@ function Sender() {
 
             <form
               onSubmit={handleSubmit}
-              className="w-full max-w-md lg:col-span-5 lg:pt-2 mt-32"
-            >
+              className="w-full max-w-md lg:col-span-5 lg:pt-2 mt-32">
               <div className="flex gap-x-4">
                 <div className="col-span-full text-white font-bold">
                   <h3>Your Code is Here:</h3>
                   <h4 className="text-white">{roomId}</h4>
-                  <div className="mt-2 flex justify-center rounded-lg border border-dashed border-white-900/25 px-6 py-10">
-                    <div className="text-center">
-                      <div className="mt-4 flex text-sm leading-6 text-white-800">
-                        <label
-                          htmlFor="file-upload"
-                          className="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500"
-                        >
-                          <span>Upload a file</span>
-                          <input
-                            id="file-upload"
-                            name="file-upload"
-                            type="file"
-                            className="sr-only"
-                          />
-                        </label>
-                        <p className="text-xs leading-5 text-white-800">
-                          or drag and drop
-                        </p>
-                      </div>
-                      <p className="text-xs leading-5 text-white-800">
-                        PNG, JPG, GIF up to 10MB
-                      </p>
-                    </div>
-                  </div>
+                  <input
+                    className="relative m-0 block w-full min-w-0 flex-auto rounded border border-solid border-neutral-300 bg-clip-padding px-3 py-[0.32rem] text-base font-normal text-black transition duration-300 ease-in-out file:-mx-3 file:-my-[0.32rem] file:overflow-hidden file:rounded-none file:border-0 file:border-solid file:border-inherit file:bg-neutral-100 file:px-3 file:py-[0.32rem] file:text-neutral-700 file:transition file:duration-150 file:ease-in-out file:[border-inline-end-width:1px] file:[margin-inline-end:0.75rem] hover:file:bg-neutral-200 focus:border-primary focus:text-black focus:shadow-te-primary focus:outline-none dark:border-neutral-600 dark:text-neutral-200 dark:file:bg-neutral-700 dark:file:text-neutral-100 dark:focus:border-primary mt-5"
+                    type="file"
+                    id="formFile"
+                  />
                 </div>
-                <button
-                  type="submit"
-                  className="flex-none rounded-md bg-white px-3.5 py-2.5 text-sm font-semibold text-white-800 shadow-sm hover:bg-sky-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white h-fit self-end"
-                >
-                  Send File
-                </button>
               </div>
+              <button
+                type="submit"
+                className="flex-none rounded-md bg-white px-3.5 py-2.5 text-sm font-semibold text-black shadow-sm hover:bg-sky-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white h-fit self-end mt-5">
+                Send File
+              </button>
             </form>
           </div>
         </div>
