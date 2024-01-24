@@ -35,7 +35,8 @@ function Sender() {
           download(new Blob(file.buffer), file.metadata.filename);
           setFile({});
         }
-      } else {
+      } 
+      else {
         console.log("Continue the transmission process...");
         socket.emit("receiver-start", { roomId });
       }
@@ -74,11 +75,14 @@ function Sender() {
     const result = socket.emit("receiver-join", { roomId: event.target[0].value });
       if (result) {
           Swal.fire({
+          position: "center",
           icon: "success",
-          title: `Download Proceesing...`,
+          title: `Please Wait Download Processing...`,
+          showConfirmButton: false,
+          timer: 2000
         });
       }
-    return null
+      return null
     } catch (error) {
       console.log(error);
       Swal.fire({
