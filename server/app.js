@@ -3,6 +3,7 @@ if (process.env.NODE_ENV !== "production") {
 }
 const express = require('express');
 const Controller = require('./controllers/controller');
+
 const { createServer } = require('node:http')
 const { Server } = require('socket.io')
 const cors = require("cors")
@@ -14,6 +15,8 @@ const io = new Server(server, {
     origin: "http://localhost:5173"
   }
 })
+const errHandle = require("./middlewares/errorHandlers");
+
 app.use(cors())
 
 
@@ -58,5 +61,8 @@ io.on('connection', (socket) => {
 server.listen(3000, () => {
   console.log('server running at http://localhost:3000');
 });
+
+app.use(errHandle)
+
 
 module.exports = app

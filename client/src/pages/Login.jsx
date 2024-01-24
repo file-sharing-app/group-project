@@ -18,12 +18,11 @@ export default function Login() {
         "http://localhost:3000/login",
         formLogin
       );
-      
-      console.log(data.access_token, "login page on submit");
       localStorage.setItem("access_token", data.access_token);
       navigate("/");
       console.log("setelah login");
-    } catch (error) {
+    } 
+    catch (error) {
       console.log(error);
       Swal.fire({
         icon: "error",
