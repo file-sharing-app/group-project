@@ -1,19 +1,17 @@
 import { createBrowserRouter, redirect } from "react-router-dom";
 import Register from "./pages/Regster";
 import Login from "./pages/Login";
-import LayOut from './layout/layout'
-import HomePage from './views/homepage'
-import Sender from './views/sender'
-import Reciever from './views/reciever'
-
+import LayOut from "./layout/layout";
+import HomePage from "./views/homepage";
+import Sender from "./views/sender";
+import Reciever from "./views/reciever";
 
 const auth = () => {
-    if (!localStorage.access_token) {
-      return redirect("/login");
-    }
-    return null;
-  };
-
+  if (!localStorage.access_token) {
+    return redirect("/login");
+  }
+  return null;
+};
 
 export const router = createBrowserRouter([
   {
