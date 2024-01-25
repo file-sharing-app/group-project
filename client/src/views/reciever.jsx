@@ -15,7 +15,19 @@ function Sender() {
       socket.on("server-meta", (metadata) => {
         console.log("server-meta", metadata);
         setFile({ metadata, transmitted: 0, buffer: [] });
-        socket.emit("receiver-start", { roomId });
+        if (!file.metadata) {
+          socket.emit("receiver-start", { roomId });
+        }
+      });
+    }
+
+    return () => {
+      socket.off("server-meta", (metadata) => {
+        console.log("server-meta", metadata);
+        setFile({ metadata, transmitted: 0, buffer: [] });
+        if (!file.metadata) {
+          socket.emit("receiver-start", { roomId });
+        }
       });
     }
   }, [socket, roomId]);
@@ -29,18 +41,41 @@ function Sender() {
         "file.metadata.total_buffer_size:",
         file?.metadata?.total_buffer_size
       );
+      console.log("file: ", file);
       if (file.transmitted) {
         if (file.transmitted >= file?.metadata?.total_buffer_size) {
           console.log("File fully transmitted. Initiating download...");
           download(new Blob(file.buffer), file.metadata.filename);
           setFile({});
         }
-      } 
-      else {
+      } else {
         console.log("Continue the transmission process...");
         socket.emit("receiver-start", { roomId });
       }
     });
+
+    return () => {
+      socket.off("server-share", () => {
+        pushBuffer(buffer);
+        sumTransmitted(buffer);
+        console.log("file.transmitted:", file.transmitted);
+        console.log(
+          "file.metadata.total_buffer_size:",
+          file?.metadata?.total_buffer_size
+        );
+        console.log("file: ", file);
+        if (file.transmitted) {
+          if (file.transmitted >= file?.metadata?.total_buffer_size) {
+            console.log("File fully transmitted. Initiating download...");
+            download(new Blob(file.buffer), file.metadata.filename);
+            setFile({});
+          }
+        } else {
+          console.log("Continue the transmission process...");
+          socket.emit("receiver-start", { roomId });
+        }
+      });
+    };
   }, [socket, file]);
 
   useEffect(() => {
@@ -70,19 +105,21 @@ function Sender() {
   function handleSubmit(event) {
     event.preventDefault();
     try {
-    const code = event.target[0].value;
-    setRoomId(code);
-    const result = socket.emit("receiver-join", { roomId: event.target[0].value });
+      const code = event.target[0].value;
+      setRoomId(code);
+      const result = socket.emit("receiver-join", {
+        roomId: event.target[0].value,
+      });
       if (result) {
-          Swal.fire({
+        Swal.fire({
           position: "center",
           icon: "success",
           title: `Please Wait Download Processing...`,
           showConfirmButton: false,
-          timer: 2000
+          timer: 2000,
         });
       }
-      return null
+      return null;
     } catch (error) {
       console.log(error);
       Swal.fire({
@@ -91,7 +128,6 @@ function Sender() {
         text: error.response.data.message,
       });
     }
-    
   }
 
   return (
@@ -124,8 +160,7 @@ function Sender() {
                 </button>
               </form>
             </div>
-            <div>
-            </div>
+            <div></div>
           </div>
         </div>
       </div>

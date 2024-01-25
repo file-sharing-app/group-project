@@ -48,7 +48,6 @@ function Sender() {
     if (roomId) socket.emit("sender-join", { roomId });
   }, [roomId]);
 
-  console.log(socket);
   useEffect(() => {
     socket.on("init", (data) => {});
     console.log(buffer, "<<< buffer");
@@ -67,6 +66,23 @@ function Sender() {
           });
         }
       });
+    }
+
+    return () => {
+      socket.off("init", (data) => {});
+      socket.off('server-start', () => {
+        console.log("server-start");
+        console.log(buffer, "<<< buffer");
+        let chunk = buffer.slice(0, metadata.buffer_size);
+        setBuffer(buffer.slice(metadata.buffer_size, buffer.length));
+        console.log(chunk, "<<<< chunk");
+        if (chunk.length != 0) {
+          socket.emit("sender-file-raw", {
+            roomId,
+            buffer: chunk,
+          });
+        }
+      })
     }
   }, [socket, buffer, metadata]);
 
