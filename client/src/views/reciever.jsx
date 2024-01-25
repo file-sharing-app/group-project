@@ -8,10 +8,11 @@ function Sender() {
   const navigate = useNavigate();
   const [file, setFile] = useState({});
   const [roomId, setRoomId] = useState("");
+  const [status, setStatus] = useState(false)
   const { socket } = useContext(SocketContext);
 
   useEffect(() => {
-    if (roomId) {
+    if (roomId && !file.metadata) {
       socket.on("server-meta", (metadata) => {
         console.log("server-meta", metadata);
         setFile({ metadata, transmitted: 0, buffer: [] });
@@ -30,52 +31,60 @@ function Sender() {
         }
       });
     }
-  }, [socket, roomId]);
+  }, [socket, roomId, file]);
 
   useEffect(() => {
-    socket.on("server-share", (buffer) => {
-      pushBuffer(buffer);
-      sumTransmitted(buffer);
-      console.log("file.transmitted:", file.transmitted);
-      console.log(
-        "file.metadata.total_buffer_size:",
-        file?.metadata?.total_buffer_size
-      );
-      console.log("file: ", file);
-      if (file.transmitted) {
-        if (file.transmitted >= file?.metadata?.total_buffer_size) {
-          console.log("File fully transmitted. Initiating download...");
-          download(new Blob(file.buffer), file.metadata.filename);
-          setFile({});
+    if (file.metadata) {
+      
+      socket.on("server-share", (buffer) => {
+        console.log('masuk', buffer);
+        if (!status) {
+          
+          pushBuffer(buffer);
+          sumTransmitted(buffer);
+          console.log("file.transmitted:", file.transmitted);
+          console.log(
+            "file.metadata.total_buffer_size:",
+            file?.metadata?.total_buffer_size
+            );
+            console.log("file: ", file);
+            if (file.transmitted) {
+              if (file.transmitted >= file?.metadata?.total_buffer_size) {
+                console.log("File fully transmitted. Initiating download...");
+                download(new Blob(file.buffer), file.metadata.filename);
+                setFile({});
+                setStatus(true)
+              }
+            } else {
+              console.log("Continue the transmission process...");
+              socket.emit("receiver-start", { roomId });
+            }
+            }
+          });
         }
-      } else {
-        console.log("Continue the transmission process...");
-        socket.emit("receiver-start", { roomId });
-      }
-    });
 
-    return () => {
-      socket.off("server-share", () => {
-        pushBuffer(buffer);
-        sumTransmitted(buffer);
-        console.log("file.transmitted:", file.transmitted);
-        console.log(
-          "file.metadata.total_buffer_size:",
-          file?.metadata?.total_buffer_size
-        );
-        console.log("file: ", file);
-        if (file.transmitted) {
-          if (file.transmitted >= file?.metadata?.total_buffer_size) {
-            console.log("File fully transmitted. Initiating download...");
-            download(new Blob(file.buffer), file.metadata.filename);
-            setFile({});
-          }
-        } else {
-          console.log("Continue the transmission process...");
-          socket.emit("receiver-start", { roomId });
-        }
-      });
-    };
+    // return () => {
+    //   socket.off("server-share", () => {
+    //     pushBuffer(buffer);
+    //     sumTransmitted(buffer);
+    //     console.log("file.transmitted:", file.transmitted);
+    //     console.log(
+    //       "file.metadata.total_buffer_size:",
+    //       file?.metadata?.total_buffer_size
+    //     );
+    //     console.log("file: ", file);
+    //     if (file.transmitted) {
+    //       if (file.transmitted >= file?.metadata?.total_buffer_size) {
+    //         console.log("File fully transmitted. Initiating download...");
+    //         download(new Blob(file.buffer), file.metadata.filename);
+    //         setFile({});
+    //       }
+    //     } else {
+    //       console.log("Continue the transmission process...");
+    //       socket.emit("receiver-start", { roomId });
+    //     }
+    //   });
+    // };
   }, [socket, file]);
 
   useEffect(() => {

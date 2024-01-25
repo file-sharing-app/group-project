@@ -26,7 +26,7 @@ function Sender() {
       shareFile({
         filename: file.name,
         total_buffer_size: new Uint8Array(reader.result).byteLength,
-        buffer_size: 1024,
+        buffer_size: 2048,
       });
     };
     reader.readAsArrayBuffer(file);
