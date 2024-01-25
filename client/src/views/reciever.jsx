@@ -57,34 +57,32 @@ function Sender() {
               }
             } else {
               console.log("Continue the transmission process...");
-              socket.emit("receiver-start", { roomId });
+              // socket.emit("receiver-start", { roomId });
             }
             }
           });
         }
 
-    // return () => {
-    //   socket.off("server-share", () => {
-    //     pushBuffer(buffer);
-    //     sumTransmitted(buffer);
-    //     console.log("file.transmitted:", file.transmitted);
-    //     console.log(
-    //       "file.metadata.total_buffer_size:",
-    //       file?.metadata?.total_buffer_size
-    //     );
-    //     console.log("file: ", file);
-    //     if (file.transmitted) {
-    //       if (file.transmitted >= file?.metadata?.total_buffer_size) {
-    //         console.log("File fully transmitted. Initiating download...");
-    //         download(new Blob(file.buffer), file.metadata.filename);
-    //         setFile({});
-    //       }
-    //     } else {
-    //       console.log("Continue the transmission process...");
-    //       socket.emit("receiver-start", { roomId });
-    //     }
-    //   });
-    // };
+    return () => {
+      socket.off("server-share", () => {
+        console.log("file.transmitted:", file.transmitted);
+        console.log(
+          "file.metadata.total_buffer_size:",
+          file?.metadata?.total_buffer_size
+        );
+        console.log("file: ", file);
+        if (file.transmitted) {
+          if (file.transmitted >= file?.metadata?.total_buffer_size) {
+            console.log("File fully transmitted. Initiating download...");
+            download(new Blob(file.buffer), file.metadata.filename);
+            setFile({});
+          }
+        } else {
+          console.log("Continue the transmission process...");
+          socket.emit("receiver-start", { roomId });
+        }
+      });
+    };
   }, [socket, file]);
 
   useEffect(() => {
